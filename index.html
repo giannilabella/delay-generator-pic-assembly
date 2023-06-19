@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Delay code generator - PIC Assembly</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <form action="javascript:generate()">
+            <div class="input-div">
+                <label for="frequency">Frequency (MHz):</label>
+                <input type="number" id="frequency" name="frequency" value=10 required>
+            </div>
+            <div class="input-div">
+                <label for="delay">Delay (miliseconds):</label>
+                <input type="number" id="delay" name="delay" value=10 required>
+            </div>
+            <div class="input-div">
+                <label for="variables">Variables (names separated by comma):</label>
+                <input type="text" id="variables" name="variables" placeholder="var0, var1, var2, ..." pattern="((\w+)(,\s*\w)*)*">
+            </div>
+            <div class="input-div">
+                <label for="registers">Registers (hexadecimal numbers separated by comma):</label>
+                <input type="text" id="registers" name="registers" placeholder="0x20, 0x21, 0x22, ..." pattern="((0x[0-9a-fA-F]+)(,\s*0x[0-9a-fA-F]+)*)|">
+            </div>
+            
+            <div class="input-div">
+                <input type="submit" value="Generate">
+            </div>
+
+            <div class="input-div">
+                <label for="subroutine">Subroutine:</label>
+                <textarea id="subroutine" name="subroutine" readonly></textarea>
+            </div>
+        </form>
+
+        <script src="main.js"></script>
+    </body>
+</html>
