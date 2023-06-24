@@ -22,42 +22,29 @@ function getGenerationParameters() {
     return [variables, registers];
 }
 
-function calculateMaxNumberOfCycles(numberOfCyclesOnInternalLoop, numberOfLoops) {
-    let totalOfCycles = 0;
-
-    for (; numberOfLoops > 0; numberOfLoops--) {
-        if (totalOfCycles == 0)
-            totalOfCycles += numberOfCyclesOnInternalLoop * Math.pow(255, numberOfLoops);
-        else
-            totalOfCycles += (numberOfCyclesOnInternalLoop - 1) * Math.pow(255, numberOfLoops);
-    }
-
-    totalOfCycles += numberOfCyclesOnInternalLoop - 1;
-    return totalOfCycles;
-}
-
-function calculatePreload() {
-    let [frequency, delay] = getCalculationParameters();
-
+function calculatePreload(frequency, delay) {
     const cyclesInInternalLoop = 4;
     const cyclesInDelay = (frequency * 1_000_000 / 4) * (delay / 1000);
 
     let numberOfLoops = 1;
-    while (calculateMaxNumberOfCycles(cyclesInInternalLoop, numberOfLoops) < (cyclesInDelay - numberOfLoops - 1)) numberOfLoops++;
-
-    let magicNumber = Math.pow(255, numberOfLoops - 1);
-    for (let k = 0; k < numberOfLoops; k++) {
-        magicNumber += (cyclesInInternalLoop - 1) * Math.pow(255, k);
+    let previousNumberOfCycles = 0;
+    let numberOfCycles = 255 * cyclesInInternalLoop + 3;
+    while (numberOfCycles < cyclesInDelay - numberOfLoops - 1) {
+        numberOfLoops++;
+        previousNumberOfCycles = numberOfCycles;
+        numberOfCycles += (numberOfCycles + 3) * 255 + numberOfCycles + 2;
     }
 
-    const preload = Math.round((cyclesInDelay - numberOfLoops - cyclesInInternalLoop) / magicNumber);
+    const preload = Math.round((cyclesInDelay - previousNumberOfCycles - 2) / (previousNumberOfCycles + 3) + 1);
 
     return [preload, numberOfLoops];
 }
 
 function generate() {
-    const [preload, numberOfLoops] = calculatePreload();
+    const [frequency, delay] = getCalculationParameters();
     const [variables, registers] = getGenerationParameters();
+
+    const [preload, numberOfLoops] = calculatePreload(frequency, delay);
 
     if (variables.length < numberOfLoops) {
         for (let i = variables.length; i < numberOfLoops; i++) {
